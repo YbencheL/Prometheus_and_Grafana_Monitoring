@@ -1,0 +1,87 @@
+services:
+  prometheus:
+    build: ./Prometheus/.
+    image: prometheus:my_tag
+    container_name: prometheus
+    ports: 
+      - 9090:9090
+    expose:
+      - 9090
+    networks:
+      monitoring:
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - prometheus:/etc/prometheus
+    restart: unless-stopped
+
+  node-exporter:
+    build: ./Node-exporter
+    image: node-exporter:my_tag
+    container_name: node-exporter
+    ports: 
+      - 9100:9100
+    expose:
+      - 9100
+    networks:
+      monitoring:
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9100/metrics"]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - /:/host:ro,rslave
+    restart: unless-stopped
+    
+  grafana:
+    build: ./Grafana/.
+    image: grafana:my_tag
+    container_name: grafana
+    ports:
+      - 3000:3000
+    expose:
+      - 3000
+    networks:
+      monitoring:
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    
+  nginx:
+    build: ./Nginx/.
+    image: nginx:my_tag
+    container_name: nginx
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      monitoring:
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    
+networks:
+  monitoring:
+
+volumes:
+  
+  prometheus:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: /home/yassine/data/prometheus
