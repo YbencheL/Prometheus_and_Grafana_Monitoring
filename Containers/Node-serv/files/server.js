@@ -18,14 +18,30 @@ const requestCounter = new client.Counter({
     labelNames: ['method', 'endpoint']
 });
 
+// custom metric - histogram
+const requestHistogram = new client.Histogram({
+    name: 'http_request_duration_seconds',
+    help: 'HTTP request duration in seconds',
+    labelNames: ['method', 'endpoint']
+});
+
 // registering requestCounter
 register.registerMetric(requestCounter);
 
+// registering requestHistogram
+register.registerMetric(requestHistogram);
+
 // Increment the counter on each request
 app.use((req, res, next) => {
-    requestCounter.inc({
-        method: req.method,
-        endpoint: req.url
+    const startTime = Date.now();
+    res.on('finish', ( ) => {
+        const duration = (Date.now() - startTime) / 1000;
+        requestCounter.inc({
+            method: req.method,
+            endpoint: req.url
+        });
+        requestHistogram.labels(req.method, req.url)
+        .observe(duration);
     });
     next();
 });
