@@ -9,7 +9,9 @@
 - Type `node_cpu_seconds_total` in the Prometheus Graph tab and hit Execute — it only goes up forever; now try `rate(node_cpu_seconds_total[5m])` and switch to Graph view; that's how you learn what `rate()` does without reading a definition
 
 - Try `increase()` and `irate()` on the same metric, then break it intentionally by using a range shorter than your scrape interval and read the error Prometheus returns
+
 - Write a minimal HTTP server in Node.js or Python, add `prom-client` or `prometheus_client`, and expose a `/metrics` endpoint with one Counter that increments on every request
+
 - Add your app as a scrape job, hit the endpoint 100 times in a loop, and query the counter in Prometheus — watch the number climb in real time
 
 ---

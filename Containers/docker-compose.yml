@@ -15,8 +15,8 @@ services:
       timeout: 30s
       retries: 5
       start_period: 30s
-    volumes:
-      - prometheus:/etc/prometheus
+    # volumes:
+    #   - prometheus:/etc/prometheus
     restart: unless-stopped
 
   node-exporter:
@@ -30,7 +30,7 @@ services:
     networks:
       monitoring:
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9100/metrics"]
+      test: ["CMD", "curl", "-f", "http://localhost:9100"]
       interval: 30s
       timeout: 30s
       retries: 5
@@ -74,14 +74,30 @@ services:
       start_period: 30s
     restart: unless-stopped
     
+  node-serv:
+    build: ./Node-serv/.
+    image: node-serv:my_tag
+    container_name: node-serv
+    ports:
+      - 8000:8000
+    networks:
+      monitoring:
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    
 networks:
   monitoring:
 
-volumes:
+# volumes:
   
-  prometheus:
-    driver: local
-    driver_opts:
-      type: 'none'
-      o: 'bind'
-      device: /home/yassine/data/prometheus
+#   prometheus:
+#     driver: local
+#     driver_opts:
+#       type: 'none'
+#       o: 'bind'
+#       device: ./Prometheus/files/prometheus.yml
