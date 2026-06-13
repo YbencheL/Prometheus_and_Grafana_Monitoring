@@ -1,0 +1,6 @@
+groups:
+  - name: alert
+    rules:
+      - alert: TargetDown
+        expr: up == 0
+        for: 35s

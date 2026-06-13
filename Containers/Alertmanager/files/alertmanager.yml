@@ -1,0 +1,7 @@
+route:
+  receiver: slack
+
+receivers:
+  - name: slack
+    slack_configs:
+      - api_url: https://hooks.slack.com/services/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

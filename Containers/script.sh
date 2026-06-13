@@ -3,7 +3,7 @@
 # Script to hit the Node server endpoint 100 times to increment the counter
 
 SERVER_URL="http://localhost:8000"
-ITERATIONS=100
+ITERATIONS=1000
 
 echo "Starting to hit $SERVER_URL endpoint $ITERATIONS times..."
 echo ""

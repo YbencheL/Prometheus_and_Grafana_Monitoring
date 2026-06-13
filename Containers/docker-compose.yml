@@ -1,4 +1,5 @@
 services:
+
   prometheus:
     build: ./Prometheus/.
     image: prometheus:my_tag
@@ -17,6 +18,24 @@ services:
       start_period: 30s
     # volumes:
     #   - prometheus:/etc/prometheus
+    restart: unless-stopped
+
+  alertmanager:
+    build: ./Alertmanager/.
+    image: alertmanager:my_tag
+    container_name: alertmanager
+    ports: 
+      - 9093:9093
+    expose:
+      - 9093
+    networks:
+      monitoring:
+    healthcheck:
+      test: ["CMD", "curl", "-i", "http://localhost:9093/-/healthy"]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
     restart: unless-stopped
 
   node-exporter:
