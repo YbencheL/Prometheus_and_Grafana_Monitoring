@@ -40,9 +40,6 @@
 ## Phase 5 — Advanced Goals (optional but valuable)
 
 - Write a recording rule that pre-computes an expensive query into a new time series — update your Grafana panel to use the recorded metric name and notice queries become instant
-- Add Loki and Promtail to your `docker-compose.yml`, add Loki as a Grafana data source, and use the split Explore pane to correlate a metric spike with the log lines that caused it
-- Build a custom exporter from scratch without a client library — write a plain HTTP server that serves `/metrics` in Prometheus text format and add it as a scrape job
-- Add `nginx-prometheus-exporter` to your stack, enable `stub_status` in `nginx.conf`, and build a panel showing active connections and requests/sec
 
 ---
 
