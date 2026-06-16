@@ -1,0 +1,58 @@
+- name: installing and setting up docker
+  ansible.builtin.shell: |
+    set -e
+    echo "installing docker...\n"
+    # Add Docker's official GPG key:
+    sudo apt update
+    sudo apt install ca-certificates curl
+    sudo install -m 0755 -d /etc/apt/keyrings
+    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+    sudo chmod a+r /etc/apt/keyrings/docker.asc
+    # Add the repository to Apt sources:
+    sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+    Types: deb
+    URIs: https://download.docker.com/linux/ubuntu
+    Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+    Components: stable
+    Architectures: $(dpkg --print-architecture)
+    Signed-By: /etc/apt/keyrings/docker.asc
+    EOF
+    sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    sudo apt update
+    echo "Done.\n"
+
+- name: Docker login
+  community.docker.docker_login:
+    username: "{{ USERNAME }}"
+    password: "{{ DOCKER_TOKEN }}"
+
+- name: Generate docker-compose file from template
+  ansible.builtin.template:
+    src: ./../files/docker-compose.yml.j2
+    dest: /home/ociadmin/prom_graf/docker-compose.yml
+    force: true
+
+- name: Start app with Compose
+  community.docker.docker_compose_v2:
+    project_src: /home/ociadmin/prom_graf
+    state: present
+    wait: false
+    build: always
+    recreate: auto
+    pull: always
+
+- name: Stop compose stack
+  community.docker.docker_compose_v2:
+    project_src: /home/ociadmin/prom_graf
+    state: absent
+  tags: [never, down]
+
+- name: Start compose stack
+  community.docker.docker_compose_v2:
+    project_src: /home/ociadmin/prom_graf
+    state: present
+  tags: [never, up]
+
+- name: Force stop all containers
+  shell: "docker stop $(docker ps -q)"
+  tags: [never, stop]
