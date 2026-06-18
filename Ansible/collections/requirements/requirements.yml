@@ -1,4 +1,2 @@
-# collections/requirements.yml
----
 collections:
   - name: community.docker
