@@ -1,5 +1,5 @@
-hosts: sandbox
-become: true
-roles:
-  - role: docker
-    tags: docker
+- hosts: sandbox
+  become: true
+  roles:
+    - role: Docker
+      tags: Docker

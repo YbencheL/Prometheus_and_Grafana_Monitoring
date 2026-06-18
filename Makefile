@@ -18,24 +18,22 @@ ANSIBLE_INVENTORY ?= Ansible/inventory.ini
 build: build-images push deploy
 
 build-images:
-	docker build -t $(PROM_IMAGE) Containers/Prometheus
-	docker build -t $(ALERT_IMAGE) Containers/Alertmanager
-	docker build -t $(NODE_IMAGE) Containers/Node-exporter
-	docker build -t $(GRAF_IMAGE) Containers/Grafana
-	docker build -t $(NGINX_IMAGE) Containers/Nginx
-	docker build -t $(NODES_IMAGE) Containers/Node-serv
-
-push:
-	docker push $(PROM_IMAGE)
-	docker push $(ALERT_IMAGE)
-	docker push $(NODE_IMAGE)
-	docker push $(GRAF_IMAGE)
-	docker push $(NGINX_IMAGE)
-	docker push $(NODES_IMAGE)
+	docker buildx build --platform linux/amd64,linux/arm64 -t $(PROM_IMAGE) \
+	--push Containers/Prometheus
+	docker buildx build --platform linux/amd64,linux/arm64 -t $(ALERT_IMAGE) \
+	--push Containers/Alertmanager
+	docker buildx build --platform linux/amd64,linux/arm64 -t $(NODE_IMAGE) \
+	--push Containers/Node-exporter
+	docker buildx build --platform linux/amd64,linux/arm64 -t $(GRAF_IMAGE) \
+	--push Containers/Grafana
+	docker buildx build --platform linux/amd64,linux/arm64 -t $(NGINX_IMAGE) \
+	--push Containers/Nginx
+	docker buildx build --platform linux/amd64,linux/arm64 -t $(NODES_IMAGE) \
+	--push Containers/Node-serv
 
 deploy:
 	ansible-playbook -i $(ANSIBLE_INVENTORY) $(ANSIBLE_PLAYBOOK) \
-	--vault-password-file ./Ansible/group_vars/sandbox/my_passwd.txt
+	--vault-password-file ./Ansible/group_vars/sandbox/my_passwd.txt --ask-become-pass
 
 remote-stop:
 	ansible-playbook -i $(ANSIBLE_INVENTORY) $(ANSIBLE_PLAYBOOK) --ask-vault-pass --tags stop
